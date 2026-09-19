@@ -1,0 +1,31 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish single-file exe
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+
+      - name: Create/Update release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: bugEDIT release
+          files: bin/Release/net8.0/win-x64/publish/bugEDIT.exe
+          generate_release_notes: true
